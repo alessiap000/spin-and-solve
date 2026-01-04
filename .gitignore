@@ -48,6 +48,6 @@
 *.iml
 .vscode/
 
-# Optional: common build folder
+# Common build folder
 build/
 
