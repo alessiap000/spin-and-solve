@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# macOS system files
+.DS_Store
+
+# IDE / Editor files
+.idea/
+*.iml
+.vscode/
+
+# Optional: common build folder
+build/
+
