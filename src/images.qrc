@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>arrow.png</file>
+        <file>background.png</file>
+        <file>gameScreen.png</file>
+        <file>Instructions.png</file>
+        <file>pink.png</file>
+        <file>SPIN_SOLVE.png</file>
+        <file>wheel.png</file>
+    </qresource>
+</RCC>
