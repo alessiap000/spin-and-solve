@@ -1,3 +1,5 @@
+// This file handles the main menu and navigation for the Spin & Solve game
+
 #include "MainController.h"
 #include "Difficulty.h"
 #include "GameController.h"
@@ -54,6 +56,7 @@ MainController::MainController(QWidget *parent) : QWidget(parent) {
     connect(instructionsButton, &QPushButton::clicked, this, &MainController::showInstructions);
 }
 
+// Handles starting the game after selecting difficulty
 void MainController::startGame() {
     Difficulty dlg(this);
     if (dlg.exec() == QDialog::Accepted) {
@@ -73,6 +76,7 @@ void MainController::startGame() {
     }
 }
 
+// Shows the instructions screen
 void MainController::showInstructions() {
     Instructions *instructions = new Instructions();
 
@@ -87,6 +91,7 @@ void MainController::showInstructions() {
     this->hide();
 }
 
+// Handle window close event to confirm exit
 void MainController::closeEvent(QCloseEvent *event) {
     QMessageBox::StandardButton reply = QMessageBox::question(
         this,

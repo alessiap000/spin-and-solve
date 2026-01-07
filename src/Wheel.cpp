@@ -1,3 +1,5 @@
+// This file handles the spinning wheel component in the game
+
 #include "Wheel.h"
 
 #include <QGraphicsPixmapItem>
@@ -9,15 +11,14 @@
 
 /*
  * The Wheel class handles the visual spinning wheel component,
- * including it's animation and the logic for determining results.
+ * including its animation and the logic for determining which segment the wheel lands on.
  */
 
 Wheel::Wheel(QWidget *parent)
     : QWidget(parent),
-
     scene(new QGraphicsScene(this)),
-    view(new QGraphicsView(scene, this)) {
-
+    view(new QGraphicsView(scene, this))
+{
     setUpWheelItem();
     setUpArrow();
 
@@ -26,7 +27,7 @@ Wheel::Wheel(QWidget *parent)
     layout->addWidget(view);
     setLayout(layout);
 
-    // Create the spin animation
+    // Create the spin animation for smooth rotation
     animation = new QPropertyAnimation(wheelItem, "rotation", this);
     animation->setEasingCurve(QEasingCurve::OutCubic);
 
@@ -35,13 +36,13 @@ Wheel::Wheel(QWidget *parent)
 
 // Loads the wheel image and positions it in the center of the screen
 void Wheel::setUpWheelItem() {
-    QPixmap wheelPixmap(":/images/images/pink.png");
+    QPixmap wheelPixmap(":/images/images/pink.png"); // corrected path from resources
     wheelItem = new WheelItem(wheelPixmap);
 
     const double cx = wheelPixmap.width() / 2.0;
     const double cy = wheelPixmap.height() / 2.0;
 
-    // Set rotation origin to center of the wheel
+    // Set rotation origin to the center of the wheel
     wheelItem->setTransformOriginPoint(cx, cy);
 
     // Center the wheel in the scene
@@ -49,55 +50,55 @@ void Wheel::setUpWheelItem() {
 
     scene->addItem(wheelItem);
 
-    // Set the scene for proper display
+    // Set the scene rect and view for proper display
     scene->setSceneRect(-cx, -cy, wheelPixmap.width(), wheelPixmap.height());
-
     view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
     view->setAlignment(Qt::AlignCenter);
-    view->scale(10, 10);
+    view->scale(10, 10); // optional scaling factor
 }
 
-// Loads the arrow image that points to the resulting segment after the spin.
+// Loads the arrow image that points to the resulting segment after the spin
 void Wheel::setUpArrow() {
-    QPixmap arrowPixmap(":/images/images/arrow.png");
+    QPixmap arrowPixmap(":/images/images/arrow.png"); // corrected path from resources
     arrowItem = new QGraphicsPixmapItem(arrowPixmap);
 
-    // Place the arrow above the wheel
     arrowItem->setScale(0.5);
     arrowItem->setPos(-scene->width() / 2 + 130, -scene->height() / 2 - 20);
 
     scene->addItem(arrowItem);
 }
 
-// Starts the spinning animation for the wheel.
+// Starts the spinning animation for the wheel
 void Wheel::spinWheel() {
-    if (isSpinning) return; // Prevents double spins
+    if (isSpinning) return; // Prevent multiple spins
 
     isSpinning = true;
 
-    // Randomize final wheel position after its rotation
-    int fullRotations = 6;
-    int randomAngle = QRandomGenerator::global()->bounded(360);
+    // Randomize the final wheel position
+    int fullRotations = 6; // number of full 360° rotations
+    int randomAngle = QRandomGenerator::global()->bounded(360); // random offset
 
     endAngle = currentRotation + 360 * fullRotations + randomAngle;
 
-    // Set the right animation parameters
+    // Configure animation
     animation->setStartValue(currentRotation);
     animation->setEndValue(endAngle);
-    animation->setDuration(4000);
+    animation->setDuration(4000); // 4 seconds spin
     animation->start();
 }
 
-// Lended segment logic
+// Handles logic after spin animation ends
 void Wheel::handleAnimationEnd() {
-    currentRotation = fmod(endAngle, 360.0); // Remember the last angle
+    currentRotation = fmod(endAngle, 360.0); // store last angle
     isSpinning = false;
 
+    // Emit the segment that the wheel landed on
     emit landedSegment(calculateSegment(currentRotation));
 }
 
+// Calculate which segment the wheel landed on based on the rotation angle
 int Wheel::calculateSegment(double angle) const {
-    const double arrowOffset = 45.0 / 2.0;
+    const double arrowOffset = 45.0 / 2.0; // half segment offset
 
     double adjusted = fmod(angle + arrowOffset, 360.0);
     int index = static_cast<int>(adjusted / segmentAngle);
@@ -105,18 +106,19 @@ int Wheel::calculateSegment(double angle) const {
     return numSegments - 1 - index;
 }
 
+// Stops the wheel mid-spin (if needed)
 void Wheel::stopSpin() {
     if (!isSpinning) return; // nothing to stop
 
     if (animation && animation->state() == QAbstractAnimation::Running) {
-        animation->stop(); // stop the animation immediately
+        animation->stop(); // immediately stop animation
     }
 
-    // Mark as not spinning
     isSpinning = false;
 
-    // Record current rotation of the wheel
+    // Record current rotation for future spins
     currentRotation = wheelItem->rotation();
 
+    // Emit the segment the wheel stopped at
     emit landedSegment(calculateSegment(currentRotation));
 }

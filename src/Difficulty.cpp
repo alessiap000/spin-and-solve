@@ -1,3 +1,5 @@
+// A simple dialog box that allows the user to select between Easy and Hard difficulty levels before starting the game
+
 #include "Difficulty.h"
 
 Difficulty::Difficulty(QWidget *parent) : QDialog(parent), difficulty(-1) {
@@ -20,12 +22,14 @@ int Difficulty::getSelectedDifficulty() const {
     return difficulty;
 }
 
+// Slot for Easy button
 void Difficulty::easyClicked() {
     difficulty = 0;
-    accept();
+    accept(); // Close the dialog and return QDialog::Accepted
 }
 
+// Slot for Hard button
 void Difficulty::hardClicked() {
     difficulty = 1;
-    accept();
+    accept(); // Close the dialog and return QDialog::Accepted
 }

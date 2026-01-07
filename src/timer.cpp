@@ -1,3 +1,5 @@
+// This file is responsible for initlaizing the timer for gameplay
+
 #ifndef TIMER_H
 #define TIMER_H
 

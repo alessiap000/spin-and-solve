@@ -1,3 +1,6 @@
+// This file implements the main gameplay logic and UI for Spin & Solve
+// It handles the wheel, letter guessing, timers, hints, gems, and end-of-game scenarios.
+
 #include "GameController.h"
 #include "MainController.h"
 #include "PhraseLibrary.h"
@@ -22,6 +25,7 @@ GameController::GameController(int diff, QWidget *parent)
     setUpUI();
 }
 
+// Wheel setup
 void GameController::setUpWheel() {
     if (!wheel) {
         wheel = new Wheel(this);
@@ -32,6 +36,7 @@ void GameController::setUpWheel() {
             "background-color: #FFE3F8;"
             );
 
+        // Connect wheel landing to reward processing
         connect(wheel, &Wheel::landedSegment, this, [=](int index){
             QStringList segments = { "2 gems","-5 seconds","3 gems","Free Hint",
                                     "1 gem","-10 seconds","2 gems","4 gems" };
@@ -44,6 +49,7 @@ void GameController::setUpWheel() {
     }
 }
 
+// Handles letter guessing
 void GameController::startLetterGuessing(const QString &landedSegment) {
 
     if (!gameActive || remainingTime <= 0 || letterDialogOpen) return;
@@ -75,6 +81,7 @@ void GameController::startLetterGuessing(const QString &landedSegment) {
 
             QChar letter = guess.isEmpty() ? QChar() : guess[0].toUpper();
 
+            // Validation in order to guess a single constant, any other guess is invalid and the user will be prompted to guess again
             if (guess.length() != 1) {
                 showWarningAndRetry("Invalid Input", "Please enter only one letter.", *askForLetter, true);
                 return;
@@ -90,6 +97,7 @@ void GameController::startLetterGuessing(const QString &landedSegment) {
                 return;
             }
 
+            // if the user attempts to guess a letter previously guessed, they will be prompted to guess another letter
             if (guessedLetters.contains(letter)) {
                 showWarningAndRetry("Already Guessed", "You already guessed that letter!", *askForLetter, true);
                 return;
@@ -97,7 +105,7 @@ void GameController::startLetterGuessing(const QString &landedSegment) {
 
             guessedLetters.insert(letter);
 
-            // Update guessed letters
+            // Update guessed letters in the text box on the game screen
             QString lettersText = "Guessed Letters: ";
             for (auto l : guessedLetters)
                 lettersText += QString(l) + " ";
@@ -123,6 +131,7 @@ void GameController::startLetterGuessing(const QString &landedSegment) {
     (*askForLetter)();
 }
 
+// Helper functions
 void GameController::showWarningAndRetry(const QString &title, const QString &text, std::function<void()> retry, bool retryDialog = false) {
     QMessageBox *msg = new QMessageBox(this);
     msg->setIcon(QMessageBox::Warning);
@@ -172,6 +181,7 @@ void GameController::handleIncorrectGuess(const QString &landedSegment) {
     }
 }
 
+// Timer functions
 void GameController::updateTimerLabel() {
     int minutes = remainingTime / 60;
     int seconds = remainingTime % 60;
@@ -268,6 +278,7 @@ void GameController::updateTimer() {
     updateTimerLabel();
 }
 
+// Initlaize labels
 void GameController::setUpLabels() {
 
     // Category label
@@ -318,6 +329,7 @@ void GameController::setUpLabels() {
     wheelResultLabel->setStyleSheet("font-size: 16px; color: #8F0774; font-weight: bold;");
 }
 
+// Handle UI set up
 void GameController::setUpUI() {
 
     // Guessed letters box
@@ -469,6 +481,7 @@ void GameController::setUpUI() {
     });
 }
 
+// Game actions
 void GameController::spinWheel()
 {
     if (wheel) wheel->spinWheel();
@@ -478,6 +491,7 @@ void GameController::buyVowel() {
 
     gameActive = false;
 
+    // Checks whether the user has enough gems to purchase a vowel
     if (wheel)
         wheel->stopSpin();
 
@@ -503,6 +517,7 @@ void GameController::buyVowel() {
                 dialog->deleteLater();
                 activeDialogs.removeOne(dialog);
 
+                // Validation for guessing a vowel
                 if (guess.isEmpty() || guess.length() != 1 || !guess[0].isLetter()) {
                     showWarningAndRetry("Invalid Input", "Enter a single vowel.", *askVowel, true);
                     return;
@@ -550,6 +565,7 @@ void GameController::buyHint() {
     if (wheel)
         wheel->stopSpin();
 
+    // Max 3 hints per round
     const int maxHints = 3;
 
     // Already used all 3 hints?
@@ -559,7 +575,7 @@ void GameController::buyHint() {
         return;
     }
 
-    // using a free hint
+    // Using a free hint
     if (freeHintsCount > 0) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
@@ -579,12 +595,12 @@ void GameController::buyHint() {
         }
     }
 
-    // no free hint since not enough gems
+    // No free hint since not enough gems
     else if (playerGems.getGems() < 5) {
         showWarningAndRetry("Not enough gems", "You need 5 gems or a free hint!", nullptr, false);
     }
 
-    // buying a hint
+    // Buying a hint with gems
     else {
         playerGems.spendGems(5);
 
@@ -665,6 +681,7 @@ void GameController::solvePhrase()
     }
 }
 
+// Utility Functions
 void GameController::closeAllDialogs() {
     for (QDialog* dlg : activeDialogs) {
         if (dlg) {
@@ -720,6 +737,7 @@ void GameController::returnToMainMenu(bool skipConfirmation) {
     if (wheel)
         wheel->stopSpin();
 
+    // Handles exiting the game and returning to the home screen
     if (!skipConfirmation) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,

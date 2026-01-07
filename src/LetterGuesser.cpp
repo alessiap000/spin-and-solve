@@ -1,8 +1,11 @@
+// This file handles the letter-guessing logic for the Spin & Solve game
+
 #include "LetterGuesser.h"
 
 LetterGuesser::LetterGuesser(const QString &phrase)
-    : phrase(phrase.toUpper())
+    : phrase(phrase.toUpper()) // store the phrase in uppercase for consistency
 {
+    // Initialize displayedPhrase with underscores for letters and spaces for word gaps
     displayedPhrase = "";
     for (QChar c : this->phrase) {
         if (c == ' ')
@@ -12,22 +15,23 @@ LetterGuesser::LetterGuesser(const QString &phrase)
     }
 }
 
+// Processes a guessed letter and updates the displayed phrase
 bool LetterGuesser::guessLetter(QChar letter)
 {
-    bool found = false;
-    QString updatedDisplay = "";
+    bool found = false;             // Tracks if the guessed letter exists in the phrase
+    QString updatedDisplay = "";    // Build the updated displayed phrase
 
-    letter = letter.toUpper();
+    letter = letter.toUpper();      // Ensure case-insensitive comparison
 
     for (int i = 0; i < phrase.length(); i++) {
         if (phrase[i] == ' ') {
-            updatedDisplay += "   ";
+            updatedDisplay += "   "; // Preserve spaces between words
         } else if (phrase[i] == letter) {
-            updatedDisplay += QString(letter) + "  ";
+            updatedDisplay += QString(letter) + "  "; // Reveal guessed letter
             found = true;
         } else {
-            // Keep current character (either letter or underscore)
-            int displayIndex = i * 3; // because each char is "_  " (3 wide)
+            // Preserve previously guessed letters or underscores
+            int displayIndex = i * 3;
             if (displayedPhrase.mid(displayIndex, 1) != "_")
                 updatedDisplay += displayedPhrase.mid(displayIndex, 3);
             else
@@ -35,16 +39,18 @@ bool LetterGuesser::guessLetter(QChar letter)
         }
     }
 
-    displayedPhrase = updatedDisplay;
-    return found;
+    displayedPhrase = updatedDisplay; // Update the stored displayed phrase
+    return found;                     // Return whether the guess was correct
 }
 
+// Returns the current state of the displayed phrase
 QString LetterGuesser::getDisplayedPhrase() const
 {
     return displayedPhrase;
 }
 
+// Returns true if the phrase has been completely guessed
 bool LetterGuesser::isComplete() const
 {
-    return !displayedPhrase.contains("_");
+    return !displayedPhrase.contains("_"); // No underscores means phrase is complete
 }

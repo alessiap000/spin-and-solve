@@ -1,3 +1,5 @@
+// File includes the lists of phrases and their corresponding hints for each category and difficulty level
+
 #include "PhraseLibrary.h"
 #include <cstdlib>
 #include <ctime>
@@ -58,7 +60,7 @@ PhraseLibrary::PhraseLibrary() : lastEasyIndex(-1), lastHardIndex(-1) {
         // COUNTRIES
         {"ITALY", "Country", {"Famous for pasta", "Rome is the capital", "Home of the Colosseum"}},
         {"POLAND", "Country", {"Eastern Europe", "Warsaw capital", "Famous for pierogi"}},
-        {"SOUTH KOREA", "Country", {"Capital Seoul", "K-pop music", "Technologically advanced"}},
+        {"SOUTH KOREA", "Country", {"Capital is Seoul", "K-pop music", "Technologically advanced"}},
         {"GREECE", "Country", {"Olympic origins", "Athens capital", "Famous islands"}},
         {"SWITZERLAND", "Country", {"Neutral country", "Alps mountains", "Famous for chocolate"}},
         {"AUSTRALIA", "Country", {"Sydney Opera House", "Kangaroos", "Southern hemisphere"}},
@@ -201,6 +203,7 @@ PhraseLibrary::PhraseLibrary() : lastEasyIndex(-1), lastHardIndex(-1) {
     lastHardIndex = -1;
 }
 
+// Randomly selects a phrase from a category, based on the difficulty level selected by the user
 Phrase PhraseLibrary::getRandomPhrase(const std::string &difficulty) {
     if (difficulty == "easy" && !easyPhrase.empty()) {
         int index;

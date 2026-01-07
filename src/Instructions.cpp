@@ -1,10 +1,11 @@
+// This file implements the instructions screen for Spin & Solve
+
 #include "Instructions.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPixmap>
 
-// The Instructions class is a QWidget window that introduces the player to the game
 Instructions::Instructions(QWidget *parent)
     : QWidget(parent)
 {

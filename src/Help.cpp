@@ -1,3 +1,5 @@
+// This file implements the Help page during gameplay to assit players with any difficulties they may encounter
+
 #include "Help.h"
 
 #include <QVBoxLayout>
